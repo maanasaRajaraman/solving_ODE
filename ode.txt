@@ -1,0 +1,121 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Oct 16 10:33:22 2023
+
+@author: 21pt12
+"""
+
+#scl ps7 solving ODE
+import sympy as sp
+import math
+import numpy as np
+
+#q1 using euler's method
+'''
+def f(x, y):
+    return (math.exp(x+y))*(math.sin(x*y))
+
+def euler(x0, y, h, x):
+    temp = 0
+    while x0 < x:
+        temp = y
+        y = y + h * f(x0, y)
+        x0 = x0 + h
+    print("f("+str(x)+") = ", y)
+    
+x0 = 0.5
+y0 = 3
+x = 3.8
+h=0.025
+
+euler(x0, y0, h, x)
+'''
+
+#q2 Modified eulers
+'''
+def f(x, y):
+    return (math.cos(x+y))*(x**2 +2*y)
+def predict(x, y, h):
+     y1p = y + h * f(x, y)
+     return y1p
+
+def correct(x, y, x1, y1, h):
+    e = 0.00001
+    y1c = y1
+    while (abs(y1c - y1) > e + 1):
+        y1 = y1c
+        y1c = y + 0.5 * h * (f(x, y) + f(x1, y1))
+    return y1c
+
+def modifiedEuler(x, xn, y, h):
+    while (x < xn):
+        x1 = x + h
+        y1p = predict(x, y, h)
+        y1c = correct(x, y, x1, y1p, h)
+        x = x1
+        y = y1c
+    print("f("+str(x)+") = ", y)
+x0 = math.pi
+y0 = -1*math.pi
+x = 3*math.pi
+h=0.9SS
+
+modifiedEuler(x0, x, y0, h)
+'''
+#runge kutta 3rd order
+'''
+def runge_kutta_third_order(f, x0, y0, h, num_steps):
+    x = x0
+    y = y0
+
+    for _ in range(num_steps):
+        k1 = h * f(x, y)
+        k2 = h * f(x + h / 2, y + k1 / 2)
+        k3 = h * f(x + h, y - k1 + 2 * k2)
+
+        y = y + (k1 + 4 * k2 + k3) / 6
+        x = x + h
+
+    return x, y
+
+def f(x, y):
+    return math.cos(x+y)*(x*x + 2*y)
+
+x0 = -2
+y0 = -1
+h = 0.1
+num_steps = int((1 - x0) / h)
+xf, yf = runge_kutta_third_order(f, x0, y0, h, num_steps)
+
+print(f"y(1) is approximately {yf:.6f}")
+
+'''
+
+#runge kutta 4th order
+'''
+def runge_kutta_fourth_order(f, x0, y0, h, num_steps):
+    x = x0
+    y = y0
+
+    for _ in range(num_steps):
+        k1 = h * f(x, y)
+        k2 = h * f(x + h/2, y + k1/2)
+        k3 = h * f(x + h/2, y + k2/2)
+        k4 = h * f(x + h, y + k3)
+
+        y = y + (k1 + 2*k2 + 2*k3 + k4) / 6
+        x = x + h
+
+    return x, y
+
+def differential_equation(x, y):
+    return math.cos(x+y)+(x*x - x*y)
+x0 = -2
+y0 = -0.5
+h = 0.1
+num_steps = int((2 - x0) / h)
+xf, yf = runge_kutta_fourth_order(differential_equation, x0, y0, h, num_steps)
+
+print(f"y(2) is approximately {yf:.6f}")
+
+'''
