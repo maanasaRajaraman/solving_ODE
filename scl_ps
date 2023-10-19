@@ -1,0 +1,666 @@
+#ps 6
+import math
+from numpy import *
+
+#q1 newtons forward backward
+
+import matplotlib.pyplot as plt
+from sympy import *
+import numpy as np
+
+def create_table(x,y,n,table):
+  for col in range(1,n):
+    for row in range(n-col):
+      table[row][col]=round(table[row+1][col-1]-table[row][col-1],2)
+
+  return table
+
+def calculate(u,n):
+  temp = u
+  for i in range(1, n):
+      temp = temp * (u - i)
+  print(temp)
+  return temp
+
+def fact(n):
+    f = 1;
+    for i in range(2, n + 1):
+        f *= i
+    return f
+
+x_val=list(map(float,input("Enter x values:").split()))
+y_val=list(map(float,input("Enter y values:").split()))
+x,y=symbols('x y')
+
+n=len(x_val)
+
+table=[[0.0 for i in range(n)]for i in range(n)]
+for i in range(n):
+    table[i][0]=y_val[i]
+
+#creating forward difference
+table=create_table(x_val,y_val,n,table)
+
+for row in table:
+  print(row)
+
+
+inp=float(input("Enter the value to be interpolated at:"))
+
+y=table[0][0]
+u=(x-x_val[0])/(x_val[1]-x_val[0])
+
+for i in range(1,n):
+  y = y + (((calculate(u, i)) * (table[0][i])) / fact(i));
+
+
+pol=simplify(y)
+res=pol.subs(x,inp)
+print("Result: ",res)
+
+x_pts=np.linspace(min(x_val),max(x_val),100)
+y_pts=[]
+
+
+for pt in x_pts:
+  y_pts.append(pol.subs(x,pt))
+
+x_val.append(inp)
+y_val.append(res)
+
+ax,fig=plt.subplots()
+plt.plot(x_pts,y_pts)
+plt.scatter(x_val,y_val,color='red')
+first_diff=diff(pol)
+res1=first_diff.subs(x,inp)
+print("Res_1: ",res1)
+
+second_diff=diff(first_diff)
+res2=second_diff.subs(x,inp)
+print("Res_2: ",res2)
+
+#Newton's backward interpolation
+
+import matplotlib.pyplot as plt
+from sympy import *
+import numpy as np
+
+def create_table(x, y, n, table):
+    for i in range(1, n):
+      for j in range(n - 1, i - 1, -1):
+        table[j][i] =table[j][i - 1] - table[j - 1][i - 1]
+    return table
+
+def calculate(u, n):
+    temp = u
+    for i in range(1, n):
+        temp = temp * (u + i)
+    return temp
+
+def fact(n):
+    f = 1
+    for i in range(2, n + 1):
+        f *= i
+    return f
+
+x_val = list(map(float, input("Enter x values: ").split()))
+y_val = list(map(float, input("Enter y values: ").split()))
+x, y = symbols('x y')
+
+n = len(x_val)
+
+table = [[0.0 for i in range(n)] for i in range(n)]
+for i in range(n):
+    table[i][0] = y_val[i]
+
+# Create backward difference table
+table = create_table(x_val, y_val, n, table)
+
+for row in table:
+    print(row)
+
+inp = float(input("Enter the value to be interpolated at: "))
+
+y = table[n-1][0]
+u = (x - x_val[n - 1]) / (x_val[1] - x_val[0])
+
+for i in range(1, n):
+    y = y + (((calculate(u, i)) * (table[n-1][i])) / fact(i))
+
+pol = simplify(y)
+res = pol.subs(x, inp)
+print("Result: ", res)
+
+x_pts = np.linspace(min(x_val), max(x_val), 100)
+y_pts = []
+
+for pt in x_pts:
+    y_pts.append(pol.subs(x, pt))
+
+x_val.append(inp)
+y_val.append(res)
+
+fig, ax = plt.subplots()
+plt.plot(x_pts, y_pts)
+plt.scatter(x_val, y_val, color='red')
+
+first_diff = diff(pol)
+res1 = first_diff.subs(x, inp)
+print("Res_1: ", res1)
+
+second_diff = diff(first_diff)
+res2 = second_diff.subs(x, inp)
+print("Res_2: ", res2)
+
+
+
+#q2
+'''
+def f1(x):
+	return math.log(x**2)
+def f2(x):
+	return math.exp(-1*(x**2))
+def f3(x):
+	return (x**2)/(1+x**3)
+'''
+#Trapezoidal rule
+'''
+a, b = 4, 5.2
+n = 6
+h=(b-a)/n
+x=linspace(a,b,n+1)
+I=0.5*(f(a)+f(b))
+for j in range(1,n): 
+   I=I+f(x[j]) 
+
+I=h*I
+print(I)
+'''
+# simpson's 1 / 3 rule 
+'''
+def simpsons_( ll, ul, n ):
+	h = ( ul - ll )/n
+	x = list()
+	fx = list()
+	i = 0
+	while i<= n:
+		x.append(ll + i * h)
+		fx.append(f3(x[i]))
+		i += 1
+	res = 0
+	i = 0
+	while i<= n:
+		if i == 0 or i == n:
+			res+= fx[i]
+		elif i % 2 != 0:
+			res+= 4 * fx[i]
+		else:
+			res+= 2 * fx[i]
+		i+= 1
+	res = res * (h / 3)
+	return res
+lower_limit = 0
+upper_limit = 1
+n = 6
+print("%.6f"% simpsons_(lower_limit, upper_limit, n))
+'''
+#simpsons 3 / 8 rule
+'''
+def simpson(l, u, lmt ):
+	
+	s = (float(u - l) / lmt)
+	sum = f3(l) + f3(u);
+
+	for i in range(1, lmt ):
+		if (i % 3 == 0):
+			sum = sum + 2 * f3(l + i * s)
+		else:
+			sum = sum + 3 * f3(l + i * s)
+	
+	return ((float(3 * s) / 8) * sum)
+
+n = 10
+l = 0
+u = 1
+res = simpson(l, u, n) 
+print (round(res, 6))
+'''
+
+#q3 train distance travelled
+t = [0, 5, 10, 15, 20, 25, 30, 35, 40]
+V = [30, 24, 19.5, 16, 13.6, 11.7, 10.0, 8.5, 7.0]
+
+#using simpsons rule
+def simpsons_( ll, ul, n, x, fx ):
+	h = ( ul - ll )/n
+	res = 0
+	i = 0
+	while i<= n:
+		if i == 0 or i == n:
+			res+= fx[i]
+		elif i % 2 != 0:
+			res+= 4 * fx[i]
+		else:
+			res+= 2 * fx[i]
+		i+= 1
+	res = res * (h / 3)
+	return res
+
+#Using Trapezoidal rule
+a, b = 0, 40
+n = 8
+h= 5
+t = [0, 5, 10, 15, 20, 25, 30, 35, 40]
+V = [30, 24, 19.5, 16, 13.6, 11.7, 10.0, 8.5, 7.0]
+I=(V[0]+V[8])
+
+for j in range(1,n): 
+   I=I+(2*V[j])
+
+I=h*I*0.5
+
+lower_limit = 0
+upper_limit = 1
+n = 6
+print("Using Simpsons Rule, distance travelled is : %.6f"% simpsons_(lower_limit, upper_limit, n, t, V))
+print("Using Trapezoidal Rule, distance travelled is : %.6f"% I)
+
+
+
+#scl ps7 solving ODE
+import sympy as sp
+import math
+import numpy as np
+
+#q1 using euler's method
+'''
+def f(x, y):
+    return (math.exp(x+y))*(math.sin(x*y))
+
+def euler(x0, y, h, x):
+    temp = 0
+    while x0 < x:
+        temp = y
+        y = y + h * f(x0, y)
+        x0 = x0 + h
+    print("f("+str(x)+") = ", y)
+    
+x0 = 0.5
+y0 = 3
+x = 3.8
+h=0.025
+
+euler(x0, y0, h, x)
+'''
+
+#q2 Modified eulers
+'''
+def f(x, y):
+    return (math.cos(x+y))*(x**2 +2*y)
+def predict(x, y, h):
+     y1p = y + h * f(x, y)
+     return y1p
+
+def correct(x, y, x1, y1, h):
+    e = 0.00001
+    y1c = y1
+    while (abs(y1c - y1) > e + 1):
+        y1 = y1c
+        y1c = y + 0.5 * h * (f(x, y) + f(x1, y1))
+    return y1c
+
+def modifiedEuler(x, xn, y, h):
+    while (x < xn):
+        x1 = x + h
+        y1p = predict(x, y, h)
+        y1c = correct(x, y, x1, y1p, h)
+        x = x1
+        y = y1c
+    print("f("+str(x)+") = ", y)
+x0 = math.pi
+y0 = -1*math.pi
+x = 3*math.pi
+h=0.9SS
+
+modifiedEuler(x0, x, y0, h)
+'''
+#runge kutta 3rd order
+'''
+def runge_kutta_third_order(f, x0, y0, h, num_steps):
+    x = x0
+    y = y0
+
+    for _ in range(num_steps):
+        k1 = h * f(x, y)
+        k2 = h * f(x + h / 2, y + k1 / 2)
+        k3 = h * f(x + h, y - k1 + 2 * k2)
+
+        y = y + (k1 + 4 * k2 + k3) / 6
+        x = x + h
+
+    return x, y
+
+def f(x, y):
+    return math.cos(x+y)*(x*x + 2*y)
+
+x0 = -2
+y0 = -1
+h = 0.1
+num_steps = int((1 - x0) / h)
+xf, yf = runge_kutta_third_order(f, x0, y0, h, num_steps)
+
+print(f"y(1) is approximately {yf:.6f}")
+
+'''
+
+#runge kutta 4th order
+'''
+def runge_kutta_fourth_order(f, x0, y0, h, num_steps):
+    x = x0
+    y = y0
+
+    for _ in range(num_steps):
+        k1 = h * f(x, y)
+        k2 = h * f(x + h/2, y + k1/2)
+        k3 = h * f(x + h/2, y + k2/2)
+        k4 = h * f(x + h, y + k3)
+
+        y = y + (k1 + 2*k2 + 2*k3 + k4) / 6
+        x = x + h
+
+    return x, y
+
+def differential_equation(x, y):
+    return math.cos(x+y)+(x*x - x*y)
+x0 = -2
+y0 = -0.5
+h = 0.1
+num_steps = int((2 - x0) / h)
+xf, yf = runge_kutta_fourth_order(differential_equation, x0, y0, h, num_steps)
+
+print(f"y(2) is approximately {yf:.6f}")
+
+'''
+
+
+
+#scl ps 8
+import numpy as np
+import math
+
+#q a) Milne’s predictor corrector method and Adam Bashforth method.
+
+def f(x,y):
+    return ((1 + x**2)*y**2)/2
+
+h = 0.1
+
+x0 = 0
+y0 = 1
+
+x1 = 0.1
+y1 = 1.06
+
+x2 = x0 + h 
+y2 = 1.12
+
+x3 = x1 + h
+y3 = 1.21
+
+x4 = x2 + h
+
+#Adams Predictor formula
+yp4 = y3 + h*(55*f(x3,y3) - 59*f(x2,y2) + 37*f(x1,y1) - 9*f(x0,y0))/24
+x4 = x3 + h 
+fp4 = f(x4,yp4) 
+print('Adams Predictor formula')
+print( 'y predicted Value = ',yp4 )
+print ('f(y predicted)  = ',fp4) 
+#Adams Corrector formula
+yc4 = y3 + h*( f(x1,y1) - 5*f(x2,y2) + 19*f(x3,y3) + 9*fp4 )/24 
+f4 = f(x4,yc4)
+print( '\nAdams Corrector formula')
+print( 'y Corrected Value = ',yc4)
+print( 'f(y Corrected) = ',f4 )
+
+yc4 = y3 + h*( f(x1,y1) - 5*f(x2,y2) + 19*f(x3,y3) + 9*f4 )/24 
+print ('\nRefined y = ',yc4)
+
+print("-----------------------------")
+#Milne Predictor formula
+yp4 = y0 + 4*h*(2*f(x1,y1) - f(x2,y2) + 2*f(x3,y3))/3
+x4 = x3 + h 
+fp4 = f(x4,yp4)
+print("Milne’s predictor corrector method")
+print( 'y predicted Value = ',yp4 )
+print ('f(y predicted)  = ',fp4) 
+#Simpson Corrector formula
+yc4 = y2 + h*( f(x2,y2) + 4*f(x3,y3) + fp4)/3 
+f4 = f(x4,yc4)
+print( 'y Corrected Value = ',yc4)
+print( 'f(y Corrected) = ',f4 )
+
+
+yc4 = y2 + h*( f(x2,y2) + 4*f(x3,y3) + f4)/3 
+print ('\n Refined y = ',yc4)
+
+print("-----------------------------")
+
+
+#q (b) using runge kutta 3 solve initially
+'''
+def runge_kutta_third_order(f, x0, y0, h, num_steps):
+    x = x0
+    y = y0
+
+    for _ in range(num_steps):
+        k1 = h * f(x, y)
+        k2 = h * f(x + h / 2, y + k1 / 2)
+        k3 = h * f(x + h, y - k1 + 2 * k2)
+
+        y = y + (k1 + 4 * k2 + k3) / 6
+        x = x + h
+
+    return x, y
+
+def f(x, y):
+    return x*y + x**2
+
+x0 = 0
+y0 = 1
+h = 0.1
+
+xVals = [0.1, 0.2, 0.3]
+yVals = []
+for i in xVals:
+    num_steps = int((i - x0) / h)
+    xf, yf = runge_kutta_third_order(f, x0, y0, h, num_steps)
+    yVals.append(yf)
+    
+
+x1, x2, x3 = 0.1, 0.2, 0.3
+y1, y2, y3 = yVals[0], yVals[1], yVals[2]
+
+x4 = x2 + h
+
+#Adams Predictor formula
+yp4 = y3 + h*(55*f(x3,y3) - 59*f(x2,y2) + 37*f(x1,y1) - 9*f(x0,y0))/24
+x4 = x3 + h 
+fp4 = f(x4,yp4) 
+print('Adams Predictor formula')
+print( 'y predicted Value = ',yp4 )
+print ('f(y predicted)  = ',fp4) 
+#Adams Corrector formula
+yc4 = y3 + h*( f(x1,y1) - 5*f(x2,y2) + 19*f(x3,y3) + 9*fp4 )/24 
+f4 = f(x4,yc4)
+print( '\nAdams Corrector formula')
+print( 'y Corrected Value = ',yc4)
+print( 'f(y Corrected) = ',f4 )
+
+yc4 = y3 + h*( f(x1,y1) - 5*f(x2,y2) + 19*f(x3,y3) + 9*f4 )/24 
+print ('\nRefined y = ',yc4)
+
+print("-----------------------------")
+#Milne Predictor formula
+yp4 = y0 + 4*h*(2*f(x1,y1) - f(x2,y2) + 2*f(x3,y3))/3
+x4 = x3 + h 
+fp4 = f(x4,yp4)
+print("Milne’s predictor corrector method")
+print( 'y predicted Value = ',yp4 )
+print ('f(y predicted)  = ',fp4) 
+#Simpson Corrector formula
+yc4 = y2 + h*( f(x2,y2) + 4*f(x3,y3) + fp4)/3 
+f4 = f(x4,yc4)
+print( 'y Corrected Value = ',yc4)
+print( 'f(y Corrected) = ',f4 )
+
+
+yc4 = y2 + h*( f(x2,y2) + 4*f(x3,y3) + f4)/3 
+print ('\n Refined y = ',yc4)
+
+print("-----------------------------")
+'''
+
+#q (c) solve initially using runge kutta 4
+'''
+def runge_kutta_fourth_order(f, x0, y0, h, num_steps):
+    x = x0
+    y = y0
+
+    for _ in range(num_steps):
+        k1 = h * f(x, y)
+        k2 = h * f(x + h/2, y + k1/2)
+        k3 = h * f(x + h/2, y + k2/2)
+        k4 = h * f(x + h, y + k3)
+
+        y = y + (k1 + 2*k2 + 2*k3 + k4) / 6
+        x = x + h
+
+    return x, y
+
+def f(x, y):
+    return 2*x*y/(1+x**2)
+
+x0 = 0
+y0 = 0
+h = 0.1
+
+xVals = [0.1, 0.2, 0.3]
+yVals = []
+for i in xVals:
+    num_steps = int((i - x0) / h)
+    xf, yf = runge_kutta_fourth_order(f, x0, y0, h, num_steps)
+    yVals.append(yf)
+    
+
+x1, x2, x3 = 0.1, 0.2, 0.3
+y1, y2, y3 = yVals[0], yVals[1], yVals[2]
+
+x4 = x2 + h
+
+#Adams Predictor formula
+yp4 = y3 + h*(55*f(x3,y3) - 59*f(x2,y2) + 37*f(x1,y1) - 9*f(x0,y0))/24
+x4 = x3 + h 
+fp4 = f(x4,yp4) 
+print('Adams Predictor formula')
+print( 'y predicted Value = ',yp4 )
+print ('f(y predicted)  = ',fp4) 
+#Adams Corrector formula
+yc4 = y3 + h*( f(x1,y1) - 5*f(x2,y2) + 19*f(x3,y3) + 9*fp4 )/24 
+f4 = f(x4,yc4)
+print( '\nAdams Corrector formula')
+print( 'y Corrected Value = ',yc4)
+print( 'f(y Corrected) = ',f4 )
+
+yc4 = y3 + h*( f(x1,y1) - 5*f(x2,y2) + 19*f(x3,y3) + 9*f4 )/24 
+print ('\nRefined y = ',yc4)
+
+print("-----------------------------")
+#Milne Predictor formula
+yp4 = y0 + 4*h*(2*f(x1,y1) - f(x2,y2) + 2*f(x3,y3))/3
+x4 = x3 + h 
+fp4 = f(x4,yp4)
+print("Milne’s predictor corrector method")
+print( 'y predicted Value = ',yp4 )
+print ('f(y predicted)  = ',fp4) 
+#Simpson Corrector formula
+yc4 = y2 + h*( f(x2,y2) + 4*f(x3,y3) + fp4)/3 
+f4 = f(x4,yc4)
+print( 'y Corrected Value = ',yc4)
+print( 'f(y Corrected) = ',f4 )
+
+
+yc4 = y2 + h*( f(x2,y2) + 4*f(x3,y3) + f4)/3 
+print ('\n Refined y = ',yc4)
+
+print("-----------------------------")
+
+'''
+
+#q(d) eulers method
+'''
+
+def euler(x0, y, h, x):
+    temp = 0
+    while x0 < x:
+        temp = y
+        y = y + h * f(x0, y)
+        x0 = x0 + h
+    return x, y
+    
+
+def f(x, y):
+    return 2*x*y/(1+x**2)
+
+x0 = 0
+y0 = 0
+h = 0.1
+
+xVals = [0.1, 0.2, 0.3]
+yVals = []
+for i in xVals:
+    num_steps = int((i - x0) / h)
+    xf, yf = euler( x0, y0, h, i)
+    yVals.append(yf)
+    
+
+x1, x2, x3 = 0.1, 0.2, 0.3
+y1, y2, y3 = yVals[0], yVals[1], yVals[2]
+
+x4 = x2 + h
+
+#Adams Predictor formula
+yp4 = y3 + h*(55*f(x3,y3) - 59*f(x2,y2) + 37*f(x1,y1) - 9*f(x0,y0))/24
+x4 = x3 + h 
+fp4 = f(x4,yp4) 
+print('Adams Predictor formula')
+print( 'y predicted Value = ',yp4 )
+print ('f(y predicted)  = ',fp4) 
+#Adams Corrector formula
+yc4 = y3 + h*( f(x1,y1) - 5*f(x2,y2) + 19*f(x3,y3) + 9*fp4 )/24 
+f4 = f(x4,yc4)
+print( '\nAdams Corrector formula')
+print( 'y Corrected Value = ',yc4)
+print( 'f(y Corrected) = ',f4 )
+
+yc4 = y3 + h*( f(x1,y1) - 5*f(x2,y2) + 19*f(x3,y3) + 9*f4 )/24 
+print ('\nRefined y = ',yc4)
+
+print("-----------------------------")
+#Milne Predictor formula
+yp4 = y0 + 4*h*(2*f(x1,y1) - f(x2,y2) + 2*f(x3,y3))/3
+x4 = x3 + h 
+fp4 = f(x4,yp4)
+print("Milne’s predictor corrector method")
+print( 'y predicted Value = ',yp4 )
+print ('f(y predicted)  = ',fp4) 
+#Simpson Corrector formula
+yc4 = y2 + h*( f(x2,y2) + 4*f(x3,y3) + fp4)/3 
+f4 = f(x4,yc4)
+print( 'y Corrected Value = ',yc4)
+print( 'f(y Corrected) = ',f4 )
+
+
+yc4 = y2 + h*( f(x2,y2) + 4*f(x3,y3) + f4)/3 
+print ('\n Refined y = ',yc4)
+
